@@ -1,0 +1,69 @@
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href = "./static/stylesheets/style.css">		
+		<title>Kube Bench Scanner</title>
+	  <script src="./static/JS/jquery-3.5.1.min.js"></script>
+	  <script src="./static/JS/htmlson.js"></script>
+	   <script type="text/javascript">
+		$(document).ready(function() {
+		   $("#scanBtn").on('click', function() {
+			$("#LoadingImage").show();
+			   $.ajax({
+				   url: "/scan",
+				   type: "GET",
+				   dataType: "json",
+				   success: function(data) {
+					$("#LoadingImage").hide();
+					   var myTable = $('.serverdetail').htmlson({
+	                   data: data,
+	                   headers: {
+						0: 'Scan Results'
+					   }
+					});
+
+				   },
+			   });
+		   });
+		});
+		function myfunc(event)
+        {
+			$("#LoadingImage").show();
+			$.ajax({
+				   url: "/results",
+				   type: "POST",
+				   dataType: "json",
+				   data: event.target.innerText,
+				   success: function(data) {
+					$("#LoadingImage").hide();
+					   var myTable = $('.response').htmlcustomson({
+	                   data: data,
+	                   headers: {
+					    0: 'Status',
+						1: 'Description'
+					   }
+					});
+
+				   },
+			   });
+        }
+   </script>		
+	</head>
+	<body>
+		<nav class="navbar navbar-light bg-light">
+			<img src="./static/stylesheets/kubebench.png" style="float: left !important;" />
+</nav>	
+<hr />
+		<div class="container-fluid">
+			<form>
+		<button id="scanBtn" type="button" class="btn btn-primary" style="margin-right: 20;">Scan All</button>
+		<button id="clear" class="btn btn-primary" onclick="window.location.reload();">Clear Results</button>
+		<div id="LoadingImage" style="display: none">
+			<img src="./static/stylesheets/loading.gif" />
+		  </div>
+		<table class="serverdetail table mt-lg-4" style="width:50%;"></table>	
+		<table class="response table mt-lg-4"style="width:90%;"></table>	
+	</form>
+		</div>
+	</body>
+</html>
