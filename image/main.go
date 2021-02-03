@@ -17,6 +17,10 @@ import (
 var tpl = template.Must(template.ParseFiles("index.html"))
 var root = "/tmp/kuberesults/kube/"
 
+const tokenfile = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+
+
+
 //Result struct is
 type Result struct {
 	Result string `json: "result"`
@@ -29,8 +33,10 @@ type File struct {
 }
 
 func kubeCall() {
-	url := "https://console-int.okd.local:443/apis/extensions/v1beta1/namespaces/kube-bench/daemonsets"
-	token := "eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLWJlbmNoIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImdvbGFuZy1zYS10b2tlbi1kYjZ4bSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJnb2xhbmctc2EiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiIxZjZlMjE1YS01NDE5LTExZWItOGM0MC0wMDBjMjk0M2FjNzYiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1iZW5jaDpnb2xhbmctc2EifQ.o4h_cEQzLksXCq58J2EdDogj95qjfxQjI9mNDyXFP1GJhTwbyM8CQQmiT77ic0vb4SRGjHSh_rZyn_FkbFi4NiUAd_K4aXmlv6EOyh5moBlauw_2g7ezBx_MJ-QZVdFfbvsyqICG70KlCBnbe6ARu3bHquWRPSQKx0wvCJpjwinUJHPZrlbhO7VIezAG4xHjjUdwH2v-sduw0z6OARX4oeV4XGZso6L2-O1f_1Dx67Lx22X9cLNe3_Iox14w44EDTpkbiViruZHrgwJ3zoehPIDNO_ZOR-40aCP1ineSqgLkxQQ9re4_kLo4AmT8Gv1M5CahOhDPBPEK2plBFR-C4A"
+	url := "https://kubernetes.default.svc:443/apis/extensions/v1beta1/namespaces/kube-bench/daemonsets"
+        //token := "eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLWJlbmNoIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImdvbGFuZy1zYS10b2tlbi1kYjZ4bSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJnb2xhbmctc2EiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiIxZjZlMjE1YS01NDE5LTExZWItOGM0MC0wMDBjMjk0M2FjNzYiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1iZW5jaDpnb2xhbmctc2EifQ.o4h_cEQzLksXCq58J2EdDogj95qjfxQjI9mNDyXFP1GJhTwbyM8CQQmiT77ic0vb4SRGjHSh_rZyn_FkbFi4NiUAd_K4aXmlv6EOyh5moBlauw_2g7ezBx_MJ-QZVdFfbvsyqICG70KlCBnbe6ARu3bHquWRPSQKx0wvCJpjwinUJHPZrlbhO7VIezAG4xHjjUdwH2v-sduw0z6OARX4oeV4XGZso6L2-O1f_1Dx67Lx22X9cLNe3_Iox14w44EDTpkbiViruZHrgwJ3zoehPIDNO_ZOR-40aCP1ineSqgLkxQQ9re4_kLo4AmT8Gv1M5CahOhDPBPEK2plBFR-C4A"
+        token1,_ := ioutil.ReadFile(tokenfile)
+        token := string(token1)
 	var bearer = "Bearer " + token
 	var jsonStr = []byte(`{
 		"apiVersion": "extensions/v1beta1",
@@ -116,6 +122,7 @@ func kubeCall() {
 					}
 				 ],
 				 "restartPolicy": "Always",
+                                 "serviceAccount": "golang-sa",
 				 "volumes": [
 					{
 					   "name": "var-lib-etcd",
@@ -197,8 +204,10 @@ func kubeCall() {
 	fmt.Println("response Body:", string(body))
 }
 func kubemaster() {
-	url := "https://console-int.okd.local:443/apis/extensions/v1beta1/namespaces/kube-bench/daemonsets"
-	token := "eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLWJlbmNoIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImdvbGFuZy1zYS10b2tlbi1kYjZ4bSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJnb2xhbmctc2EiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiIxZjZlMjE1YS01NDE5LTExZWItOGM0MC0wMDBjMjk0M2FjNzYiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1iZW5jaDpnb2xhbmctc2EifQ.o4h_cEQzLksXCq58J2EdDogj95qjfxQjI9mNDyXFP1GJhTwbyM8CQQmiT77ic0vb4SRGjHSh_rZyn_FkbFi4NiUAd_K4aXmlv6EOyh5moBlauw_2g7ezBx_MJ-QZVdFfbvsyqICG70KlCBnbe6ARu3bHquWRPSQKx0wvCJpjwinUJHPZrlbhO7VIezAG4xHjjUdwH2v-sduw0z6OARX4oeV4XGZso6L2-O1f_1Dx67Lx22X9cLNe3_Iox14w44EDTpkbiViruZHrgwJ3zoehPIDNO_ZOR-40aCP1ineSqgLkxQQ9re4_kLo4AmT8Gv1M5CahOhDPBPEK2plBFR-C4A"
+	url := "https://kubernetes.default.svc:443/apis/extensions/v1beta1/namespaces/kube-bench/daemonsets"
+	//token := "eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLWJlbmNoIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImdvbGFuZy1zYS10b2tlbi1kYjZ4bSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJnb2xhbmctc2EiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiIxZjZlMjE1YS01NDE5LTExZWItOGM0MC0wMDBjMjk0M2FjNzYiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1iZW5jaDpnb2xhbmctc2EifQ.o4h_cEQzLksXCq58J2EdDogj95qjfxQjI9mNDyXFP1GJhTwbyM8CQQmiT77ic0vb4SRGjHSh_rZyn_FkbFi4NiUAd_K4aXmlv6EOyh5moBlauw_2g7ezBx_MJ-QZVdFfbvsyqICG70KlCBnbe6ARu3bHquWRPSQKx0wvCJpjwinUJHPZrlbhO7VIezAG4xHjjUdwH2v-sduw0z6OARX4oeV4XGZso6L2-O1f_1Dx67Lx22X9cLNe3_Iox14w44EDTpkbiViruZHrgwJ3zoehPIDNO_ZOR-40aCP1ineSqgLkxQQ9re4_kLo4AmT8Gv1M5CahOhDPBPEK2plBFR-C4A"
+        token1,_ := ioutil.ReadFile(tokenfile)
+        token := string(token1)
 	var bearer = "Bearer " + token
 	var jsonStr = []byte(`{
 		"apiVersion": "extensions/v1beta1",
@@ -287,6 +296,7 @@ func kubemaster() {
 					}
 				 ],
 				 "restartPolicy": "Always",
+                                 "serviceAccount": "golang-sa",
 				 "volumes": [
 					{
 					   "name": "var-lib-etcd",
@@ -368,8 +378,10 @@ func kubemaster() {
 	fmt.Println("response Body:", string(body))
 }
 func kubeDel() {
-	url := "https://console-int.okd.local:443/apis/extensions/v1beta1/namespaces/kube-bench/daemonsets/kube-bench"
-	token := "eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLWJlbmNoIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImdvbGFuZy1zYS10b2tlbi1kYjZ4bSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJnb2xhbmctc2EiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiIxZjZlMjE1YS01NDE5LTExZWItOGM0MC0wMDBjMjk0M2FjNzYiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1iZW5jaDpnb2xhbmctc2EifQ.o4h_cEQzLksXCq58J2EdDogj95qjfxQjI9mNDyXFP1GJhTwbyM8CQQmiT77ic0vb4SRGjHSh_rZyn_FkbFi4NiUAd_K4aXmlv6EOyh5moBlauw_2g7ezBx_MJ-QZVdFfbvsyqICG70KlCBnbe6ARu3bHquWRPSQKx0wvCJpjwinUJHPZrlbhO7VIezAG4xHjjUdwH2v-sduw0z6OARX4oeV4XGZso6L2-O1f_1Dx67Lx22X9cLNe3_Iox14w44EDTpkbiViruZHrgwJ3zoehPIDNO_ZOR-40aCP1ineSqgLkxQQ9re4_kLo4AmT8Gv1M5CahOhDPBPEK2plBFR-C4A"
+	url := "https://kubernetes.default.svc:443/apis/extensions/v1beta1/namespaces/kube-bench/daemonsets/kube-bench"
+	//token := "eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLWJlbmNoIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImdvbGFuZy1zYS10b2tlbi1kYjZ4bSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJnb2xhbmctc2EiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiIxZjZlMjE1YS01NDE5LTExZWItOGM0MC0wMDBjMjk0M2FjNzYiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1iZW5jaDpnb2xhbmctc2EifQ.o4h_cEQzLksXCq58J2EdDogj95qjfxQjI9mNDyXFP1GJhTwbyM8CQQmiT77ic0vb4SRGjHSh_rZyn_FkbFi4NiUAd_K4aXmlv6EOyh5moBlauw_2g7ezBx_MJ-QZVdFfbvsyqICG70KlCBnbe6ARu3bHquWRPSQKx0wvCJpjwinUJHPZrlbhO7VIezAG4xHjjUdwH2v-sduw0z6OARX4oeV4XGZso6L2-O1f_1Dx67Lx22X9cLNe3_Iox14w44EDTpkbiViruZHrgwJ3zoehPIDNO_ZOR-40aCP1ineSqgLkxQQ9re4_kLo4AmT8Gv1M5CahOhDPBPEK2plBFR-C4A"
+        token1,_ := ioutil.ReadFile(tokenfile)
+        token := string(token1)
 	var bearer = "Bearer " + token
 	var jsonStr = []byte(`{"kind":"DeleteOptions","apiVersion":"v1","propagationPolicy":"Foreground"}`)
 	req, err := http.NewRequest("DELETE", url, bytes.NewBuffer(jsonStr))
@@ -405,8 +417,10 @@ func kubeDel() {
 	fmt.Println("response Body:", string(body))
 }
 func kubeDel1() {
-	url := "https://console-int.okd.local:443/apis/extensions/v1beta1/namespaces/kube-bench/daemonsets/kube-bench-master"
-	token := "eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLWJlbmNoIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImdvbGFuZy1zYS10b2tlbi1kYjZ4bSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJnb2xhbmctc2EiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiIxZjZlMjE1YS01NDE5LTExZWItOGM0MC0wMDBjMjk0M2FjNzYiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1iZW5jaDpnb2xhbmctc2EifQ.o4h_cEQzLksXCq58J2EdDogj95qjfxQjI9mNDyXFP1GJhTwbyM8CQQmiT77ic0vb4SRGjHSh_rZyn_FkbFi4NiUAd_K4aXmlv6EOyh5moBlauw_2g7ezBx_MJ-QZVdFfbvsyqICG70KlCBnbe6ARu3bHquWRPSQKx0wvCJpjwinUJHPZrlbhO7VIezAG4xHjjUdwH2v-sduw0z6OARX4oeV4XGZso6L2-O1f_1Dx67Lx22X9cLNe3_Iox14w44EDTpkbiViruZHrgwJ3zoehPIDNO_ZOR-40aCP1ineSqgLkxQQ9re4_kLo4AmT8Gv1M5CahOhDPBPEK2plBFR-C4A"
+	url := "https://kubernetes.default.svc:443/apis/extensions/v1beta1/namespaces/kube-bench/daemonsets/kube-bench-master"
+	//token := "eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLWJlbmNoIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImdvbGFuZy1zYS10b2tlbi1kYjZ4bSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJnb2xhbmctc2EiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiIxZjZlMjE1YS01NDE5LTExZWItOGM0MC0wMDBjMjk0M2FjNzYiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1iZW5jaDpnb2xhbmctc2EifQ.o4h_cEQzLksXCq58J2EdDogj95qjfxQjI9mNDyXFP1GJhTwbyM8CQQmiT77ic0vb4SRGjHSh_rZyn_FkbFi4NiUAd_K4aXmlv6EOyh5moBlauw_2g7ezBx_MJ-QZVdFfbvsyqICG70KlCBnbe6ARu3bHquWRPSQKx0wvCJpjwinUJHPZrlbhO7VIezAG4xHjjUdwH2v-sduw0z6OARX4oeV4XGZso6L2-O1f_1Dx67Lx22X9cLNe3_Iox14w44EDTpkbiViruZHrgwJ3zoehPIDNO_ZOR-40aCP1ineSqgLkxQQ9re4_kLo4AmT8Gv1M5CahOhDPBPEK2plBFR-C4A"
+        token1,_ := ioutil.ReadFile(tokenfile)
+        token := string(token1)
 	var bearer = "Bearer " + token
 	var jsonStr = []byte(`{"kind":"DeleteOptions","apiVersion":"v1","propagationPolicy":"Foreground"}`)
 	req, err := http.NewRequest("DELETE", url, bytes.NewBuffer(jsonStr))
