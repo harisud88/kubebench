@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    pv.kubernetes.io/bind-completed: "yes"
+    pv.kubernetes.io/bound-by-controller: "yes"
+  creationTimestamp: 2021-01-10T13:57:35Z
+  finalizers:
+  - kubernetes.io/pvc-protection
+  name: kube-pvc
+  namespace: kube-bench
+  resourceVersion: "28105"
+  selfLink: /api/v1/namespaces/kube-bench/persistentvolumeclaims/kube-pvc
+  uid: cab85840-534b-11eb-9fbd-000c2943ac76
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: pv0002
+status:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 2Gi
+  phase: Bound
